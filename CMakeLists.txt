@@ -14,7 +14,8 @@ add_executable (Buff_test_cmd
     "Frame.h" 
     "FrameBuffer.h" "FrameBuffer.cpp"
     "Camera.h" "Camera.cpp"
-    "CameraManager.h" "CameraManager.cpp")
+    "CameraManager.h" "CameraManager.cpp" 
+    "FrameProcessor.h" "FrameProcessor.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Buff_test_cmd PROPERTY CXX_STANDARD 20)
