@@ -1,5 +1,8 @@
 #include "Camera.h"
 
+#include <iomanip>
+#include <sstream>
+
 Camera::Camera(
     const MV_CC_DEVICE_INFO& deviceInfo,
     size_t bufferCapacity)
@@ -126,7 +129,10 @@ void Camera::onFrame(
     Frame output;
 
     output.frameNumber =
-        info.nFrameNum;
+        info.nFrameNum; 
+
+    output.triggerIndex =
+        info.nTriggerIndex;
 
     output.width =
         info.nExtendWidth;

@@ -33,13 +33,21 @@ int main()
 	// Создаём обработчик для каждой камеры
 	std::vector<std::unique_ptr<FrameProcessor>> processors;
 
+	const auto now = std::chrono::system_clock::now();
+	const auto time =
+		std::chrono::time_point_cast<std::chrono::seconds>(now);
+
+	const auto sessionDirectory =
+		std::filesystem::path("frames") /
+		std::format("{:%Y-%m-%d_%H-%M-%S}", time);
+
 	for (size_t i = 0; i < cameras.count(); ++i)
 	{
 		auto* camera = cameras.camera(i);
 
 		auto processor = std::make_unique<FrameProcessor>(
 			camera->buffer(),
-			"frames/camera_" + std::to_string(i));
+			sessionDirectory / ("camera_" + std::to_string(i)));
 
 		if (!processor->start())
 		{
