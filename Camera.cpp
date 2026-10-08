@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include <cassert>
 
 Camera::Camera(
     const MV_CC_DEVICE_INFO& deviceInfo,
@@ -38,6 +39,21 @@ bool Camera::open()
 
         return false;
     }
+
+//   ret = MV_CC_SetBoolValue(
+//       m_handle,
+//       "GevIEEE1588",
+//       true);
+//
+//
+//   if (ret != MV_OK)
+//   {
+//       MV_CC_CloseDevice(m_handle);
+//       MV_CC_DestroyHandle(m_handle);
+//       m_handle = nullptr;
+//       assert(true);
+//       return false;
+//   }
 
     m_isOpen = true;
 
@@ -129,7 +145,7 @@ void Camera::onFrame(
 //        ? info.nTriggerIndex
 //        : info.nFrameNum;
 
-    output.frameNumber = info.nFrameCounter;
+    output.frameNumber = info.nFrameNum;
 
     output.trigNumber = info.nTriggerIndex;
 

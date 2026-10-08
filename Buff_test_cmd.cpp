@@ -68,7 +68,7 @@ int main()
 
 	// Работаем 30 секунд
 	std::this_thread::sleep_for(
-		std::chrono::seconds(30));
+		std::chrono::seconds(10));
 
 	cameras.stopAll();
 

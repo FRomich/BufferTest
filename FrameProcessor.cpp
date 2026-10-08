@@ -108,14 +108,18 @@ void FrameProcessor::process()
 
 bool FrameProcessor::saveFrame(const Frame& frame)
 {
+    const auto timestamp = std::to_string(frame.deviceTimeStamp);
+
+    const auto timestampPart =
+        timestamp.substr(timestamp.size() - 13, 6);
+
     const auto filename =
         m_outputDirectory /
         std::format(
-            "{:05}_{:05}_{}.bin",
+            "{}_{:05}_{}.bin",
+            timestampPart,
             frame.frameNumber,
-            frame.trigNumber,
-            frame.deviceTimeStamp
-            //,frame.hostTimeStamp
+            frame.trigNumber
         );
 
     std::ofstream file(
