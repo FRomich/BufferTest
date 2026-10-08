@@ -111,11 +111,12 @@ bool FrameProcessor::saveFrame(const Frame& frame)
     const auto filename =
         m_outputDirectory /
         std::format(
-            "{:05}_{}_{}_{}.bin",
+            "{:05}_{:05}_{}.bin",
             frame.frameNumber,
-            frame.deviceTimeStamp,
-            frame.hostTimeStamp,
-            frame.triggerIndex);
+            frame.trigNumber,
+            frame.deviceTimeStamp
+            //,frame.hostTimeStamp
+        );
 
     std::ofstream file(
         filename,

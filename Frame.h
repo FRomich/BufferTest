@@ -5,8 +5,7 @@
 struct Frame {
     /// Numbers frame
     uint32_t frameNumber = 0;
-
-    uint32_t triggerIndex = 0;
+    uint32_t trigNumber = 0;
 
     uint32_t width = 0;
     uint32_t height = 0;
