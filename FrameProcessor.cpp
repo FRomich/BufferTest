@@ -7,9 +7,13 @@
 FrameProcessor::FrameProcessor(
     FrameBuffer& buffer,
     DataBase& db,
+    int sessionId,
+    int cameraId,
     std::filesystem::path outputDirectory)
     : m_buffer(buffer)
-    ,m_database(db)
+    , m_database(db)
+    , m_sessionId(sessionId)
+    , m_cameraId(cameraId)
     , m_outputDirectory(std::move(outputDirectory))
 {
 }
@@ -140,18 +144,6 @@ bool FrameProcessor::saveFrame(const Frame& frame)
             frame.trigNumber
         );
 
-  //сохраним в бд
-    if (!m_database.insertFrame(
-        m_sessionId,
-        m_cameraId,
-        frame,
-        filename.string()))
-    {
-        std::cerr << "Database error: "
-            << m_database.lastError() << '\n';
-        return false;
-    }
-
    // BMP требует выравнивания каждой строки по 4 байтам.
     const uint32_t rowSize = (width + 3u) & ~3u;
     const uint32_t paddedImageSize = rowSize * height;
@@ -232,10 +224,23 @@ bool FrameProcessor::saveFrame(const Frame& frame)
         file.write(row.data(), row.size());
     }
 
+    file.close();
+
     if (!file)
     {
         std::cerr << "Error writing BMP: "
             << filename.string() << '\n';
+        return false;
+    }
+
+    if (!m_database.insertFrame(
+        m_sessionId,
+        m_cameraId,
+        frame,
+        std::filesystem::absolute(filename).string()))
+    {
+        std::cerr << "Database error: "
+            << m_database.lastError() << '\n';
         return false;
     }
 

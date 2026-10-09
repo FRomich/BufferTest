@@ -14,6 +14,8 @@ public:
     FrameProcessor(
         FrameBuffer& buffer,
         DataBase& db,
+        int sessionId,
+        int cameraId,
         std::filesystem::path outputDirectory);
 
     ~FrameProcessor();

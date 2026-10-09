@@ -28,6 +28,10 @@ public:
         const Frame& frame,
         const std::string& filePath);
 
+    std::int64_t createSession(
+        const std::string& sessionName,
+        const std::string& directoryPath);
+
 private:
     PGconn* m_connection = nullptr;
     std::string m_lastError;

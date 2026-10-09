@@ -61,6 +61,23 @@ int main()
 	const auto sessionDirectory =
 		std::filesystem::path("frames") /
 		std::format("{:%Y-%m-%d_%H-%M-%S}", time);
+	/////
+	const std::string sessionName =
+		sessionDirectory.filename().string();
+
+	const auto sessionId = db.createSession(
+		sessionDirectory.filename().string(),
+		std::filesystem::absolute(sessionDirectory).string());
+
+	if (sessionId == 0)
+	{
+		std::cerr << "Failed to create session: "
+			<< db.lastError() << '\n';
+		return EXIT_FAILURE;
+	}
+
+	std::cout << "Session ID: " << sessionId << '\n';
+
 
 	for (size_t i = 0; i < cameras.count(); ++i)
 	{
@@ -69,7 +86,10 @@ int main()
 		auto processor = std::make_unique<FrameProcessor>(
 			camera->buffer(),
 			db,
-			sessionDirectory / ("camera_" + std::to_string(i)));
+			sessionId,              // ID записи в frame_sessions
+			static_cast<int>(i),    // ID/индекс камеры
+			sessionDirectory /
+			("camera_" + std::to_string(i)));
 
 		if (!processor->start())
 		{

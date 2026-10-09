@@ -163,3 +163,58 @@ bool DataBase::insertFrame(
     PQclear(result);
     return success;
 }
+
+std::int64_t DataBase::createSession(
+    const std::string& sessionName,
+    const std::string& directoryPath)
+{
+    if (!isConnected())
+    {
+        m_lastError = "Database is not connected";
+        return 0;
+    }
+
+    const char* sql = R"(
+        INSERT INTO public.frame_sessions
+            (session_name, directory_path, started_at)
+        VALUES ($1, $2, now())
+        RETURNING id
+    )";
+
+    const std::array<const char*, 2> params = {
+        sessionName.c_str(),
+        directoryPath.c_str()
+    };
+
+    PGresult* result = PQexecParams(
+        m_connection,
+        sql,
+        2,
+        nullptr,
+        params.data(),
+        nullptr,
+        nullptr,
+        0);
+
+    if (!result)
+    {
+        m_lastError = PQerrorMessage(m_connection);
+        return 0;
+    }
+
+    if (PQresultStatus(result) != PGRES_TUPLES_OK ||
+        PQntuples(result) != 1)
+    {
+        m_lastError = PQresultErrorMessage(result);
+        PQclear(result);
+        return 0;
+    }
+
+    const auto sessionId =
+        std::stoll(PQgetvalue(result, 0, 0));
+
+    PQclear(result);
+    m_lastError.clear();
+
+    return sessionId;
+}
