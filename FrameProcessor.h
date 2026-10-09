@@ -6,12 +6,14 @@
 #include <cstdint>
 #include <filesystem>
 #include <thread>
+#include "DataBase.h"
 
 class FrameProcessor
 {
 public:
     FrameProcessor(
         FrameBuffer& buffer,
+        DataBase& db,
         std::filesystem::path outputDirectory);
 
     ~FrameProcessor();
@@ -41,4 +43,8 @@ private:
 
     std::atomic<uint64_t> m_processed{ 0 };
     std::atomic<uint64_t> m_failed{ 0 };
+
+    DataBase& m_database;
+    int m_sessionId;
+    int m_cameraId;
 };

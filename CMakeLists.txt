@@ -15,7 +15,8 @@ add_executable (Buff_test_cmd
     "FrameBuffer.h" "FrameBuffer.cpp"
     "Camera.h" "Camera.cpp"
     "CameraManager.h" "CameraManager.cpp" 
-    "FrameProcessor.h" "FrameProcessor.cpp")
+    "FrameProcessor.h" "FrameProcessor.cpp" 
+    "DataBase.h" "DataBase.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Buff_test_cmd PROPERTY CXX_STANDARD 20)
@@ -34,6 +35,19 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     "${MVS_ROOT}/Libraries/win64/MvCameraControl.lib"
 )
 
+#postgres
+set(PG_ROOT "c:/Program Files/PostgreSQL/10")
+set(PG_RUNTIME "${PG_ROOT}/bin")
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    "${PG_ROOT}/Include"
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    "${PG_ROOT}/Lib/libpq.lib"
+)
+
+
  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -43,4 +57,38 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${MVS_RUNTIME}/MVGigEVisionSDK.dll"
             "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${MVS_RUNTIME}/MediaProcess.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${MVS_RUNTIME}/ThirdParty/avutil-60.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+            
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${MVS_RUNTIME}/ThirdParty/libwinpthread-1.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+        
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${MVS_RUNTIME}/ThirdParty/swscale-9.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PG_RUNTIME}/LIBPQ.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PG_RUNTIME}/libssl-1_1-x64.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PG_RUNTIME}/libintl-8.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PG_RUNTIME}/libiconv-2.dll"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+
+
  )

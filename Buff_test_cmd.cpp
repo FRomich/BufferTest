@@ -1,12 +1,33 @@
 ﻿#include <iostream>
 
-#include "MvCameraControl.h"
-
 #include "CameraManager.h"
 #include "FrameProcessor.h"
+#include "DataBase.h"
+
 
 int main()
 {
+	DataBase db;
+
+	const char* conninfo =
+		"host=172.29.166.213 "
+		"port=5432 "
+		"dbname=postgres "
+		"user=postgres "
+		"password=postgres "
+		"connect_timeout=5";
+
+	if (!db.connect(conninfo))
+	{
+		std::cerr << db.lastError() << '\n';
+		return 1;
+	}
+
+	std::cout << "Connected\n";
+
+
+
+#if 1
 	CameraManager cameras;
 
 	if (!cameras.initialize())
@@ -47,6 +68,7 @@ int main()
 
 		auto processor = std::make_unique<FrameProcessor>(
 			camera->buffer(),
+			db,
 			sessionDirectory / ("camera_" + std::to_string(i)));
 
 		if (!processor->start())
@@ -68,7 +90,7 @@ int main()
 
 	// Работаем 30 секунд
 	std::this_thread::sleep_for(
-		std::chrono::seconds(10));
+		std::chrono::seconds(5));
 
 	cameras.stopAll();
 
@@ -105,6 +127,7 @@ int main()
 
 
 	cameras.closeAll();
+#endif
 
 	return EXIT_SUCCESS;
 }

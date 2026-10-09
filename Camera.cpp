@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include <cassert>
+#include <iostream>
 
 Camera::Camera(
     const MV_CC_DEVICE_INFO& deviceInfo,
@@ -141,13 +142,12 @@ void Camera::onFrame(
 
     Frame output;
 
-//    output.frameNumber = info.nTriggerIndex
-//        ? info.nTriggerIndex
-//        : info.nFrameNum;
-
     output.frameNumber = info.nFrameNum;
 
     output.trigNumber = info.nTriggerIndex;
+
+    output.width =
+        info.nExtendWidth;
 
     output.height =
         info.nExtendHeight;
@@ -169,12 +169,43 @@ void Camera::onFrame(
     output.dataSize =
         info.nFrameLenEx;
 
-    output.data.resize(output.dataSize);
+    //преобразуем в bgr8
+    const unsigned int width = info.nExtendWidth;
+    const unsigned int height = info.nExtendHeight;
+    const unsigned int nChannelNum = 1;
 
-    std::memcpy(
-        output.data.data(),
-        frame->pBufAddr,
-        output.dataSize);
+    const unsigned int dstSize = width * height;
+
+    std::vector<unsigned char> converted(dstSize);
+
+    MV_CC_PIXEL_CONVERT_PARAM_EX param{};
+    param.nWidth = width;
+    param.nHeight = height;
+    param.enSrcPixelType = info.enPixelType;
+    param.pSrcData = frame->pBufAddr;
+    param.nSrcDataLen = info.nFrameLen;
+    param.enDstPixelType = PixelType_Gvsp_Mono8;
+    param.pDstBuffer = converted.data();
+    param.nDstBufferSize = dstSize;
+
+    const int ret = MV_CC_ConvertPixelTypeEx(m_handle, &param);
+
+    if (ret != MV_OK)
+    {
+        if (!autoFree)
+        {
+            MV_CC_FreeImageBuffer(m_handle, frame);
+        }
+
+        return;
+    }
+
+    output.data.assign(
+        converted.begin(),
+        converted.begin() + param.nDstLen
+    );
+
+    output.dataSize = param.nDstLen;
 
     m_buffer.push(std::move(output));
 
